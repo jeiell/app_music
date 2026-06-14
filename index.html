@@ -1,0 +1,841 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#050608">
+    <link rel="manifest" href="manifest.json">
+    <title>Cyber Audio Glass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-900: #050608;
+            --bg-850: #0c1016;
+            --surface: rgba(255, 255, 255, 0.06);
+            --surface-strong: rgba(255, 255, 255, 0.12);
+            --text-primary: #f8f8f9;
+            --text-muted: #a0a8b8;
+            --accent: #ff000f;
+            --accent-soft: rgba(255, 0, 15, 0.24);
+            --accent-strong: #ff2542;
+            --shadow: 0 32px 90px rgba(0, 0, 0, 0.36);
+            --transition: 0.24s ease;
+        }
+
+        body.light {
+            --bg-900: #ffffff;
+            --bg-850: #ffffff;
+            --surface: rgba(255, 255, 255, 0.95);
+            --surface-strong: rgba(255, 255, 255, 1);
+            --text-primary: #111827;
+            --text-muted: #6b7280;
+            --accent: #d7263d;
+            --accent-soft: rgba(215, 38, 61, 0.15);
+            --accent-strong: #ff4d5a;
+            --shadow: 0 32px 70px rgba(0, 0, 0, 0.12);
+        }
+
+        html, body {
+            min-height: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background: radial-gradient(circle at top, rgba(255, 59, 79, 0.12), transparent 18%),
+                        linear-gradient(180deg, var(--bg-900), var(--bg-850) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.9rem;
+            transition: background var(--transition), color var(--transition);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 85% 20%, rgba(255, 0, 15, 0.20), transparent 12%),
+                        radial-gradient(circle at 20% 90%, rgba(255, 255, 255, 0.06), transparent 18%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .app-shell {
+            position: relative;
+            width: min(440px, 100%);
+            max-height: 100vh;
+            display: grid;
+            gap: 1rem;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .app-shell::before {
+            content: '';
+            position: absolute;
+            inset: -1rem;
+            border-radius: 42px;
+            background: linear-gradient(180deg, rgba(255, 0, 15, 0.25), rgba(255, 255, 255, 0.03));
+            filter: blur(24px);
+            opacity: 0.65;
+            z-index: -1;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .app-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 10px;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-shadow: 0 0 24px rgba(255, 59, 79, 0.18);
+        }
+
+        .icon-button {
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 59, 79, 0.12);
+            color: var(--text-primary);
+            border-radius: 14px;
+            padding: 0.9rem 1rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+        }
+
+        .icon-button:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 59, 79, 0.18);
+        }
+
+        .card {
+            position: relative;
+            border-radius: 32px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(24px);
+            box-shadow: var(--shadow);
+            padding: 1.3rem 1rem 0.9rem;
+            overflow: hidden;
+            transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), transparent 58%);
+            pointer-events: none;
+        }
+
+        .menu-container {
+            position: relative;
+            width: min(250px, 100%);
+            height: 220px;
+            margin: 0 auto 0.65rem;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(24px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 32px 70px rgba(0, 0, 0, 0.30);
+        }
+
+        .menu-item {
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: transform var(--transition), background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition);
+        }
+
+        .menu-item:hover,
+        .menu-item:focus-visible {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.18);
+            outline: none;
+        }
+
+        .menu-item.active {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.24);
+            border-color: rgba(255, 0, 15, 0.75);
+            box-shadow: 0 18px 30px rgba(255, 0, 15, 0.22);
+        }
+
+        .menu-item.highlighted {
+            color: #ff162b;
+            text-shadow: 0 0 16px rgba(255, 22, 43, 0.85);
+        }
+
+        .menu-item:nth-child(1) { top: 8px; left: calc(50% - 19px); }
+        .menu-item:nth-child(2) { top: 52px; right: 14px; }
+        .menu-item:nth-child(3) { top: 122px; right: 14px; }
+        .menu-item:nth-child(4) { bottom: 8px; left: calc(50% - 19px); }
+        .menu-item:nth-child(5) { bottom: 52px; left: 14px; }
+        .menu-item:nth-child(6) { top: 52px; left: 14px; }
+
+        .central-dimmer {
+            position: relative;
+            width: 122px;
+            height: 122px;
+            border-radius: 50%;
+            background: rgba(18, 12, 16, 0.34);
+            border: 1px solid rgba(255, 0, 15, 0.25);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 18px 30px rgba(255, 0, 15, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform var(--transition);
+        }
+
+        .central-dimmer:hover {
+            transform: translateY(-2px);
+        }
+
+        .dimmer-inner {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(18, 14, 20, 0.92);
+            border: 1px solid rgba(255, 0, 15, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .led-indicator {
+            position: absolute;
+            top: 14px;
+            left: calc(50% - 2px);
+            width: 4px;
+            height: 18px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #ff5d6d 0%, #ff0018 100%);
+            box-shadow: 0 0 26px rgba(255, 0, 15, 0.9);
+            transform-origin: center 48px;
+            transition: transform 0.2s ease, opacity var(--transition);
+        }
+
+        .center-play-btn {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 1.7rem;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: transform var(--transition), color var(--transition);
+        }
+
+        .center-play-btn:active {
+            transform: scale(0.96);
+        }
+
+        .center-play-btn:focus-visible {
+            outline: 2px solid rgba(255, 59, 79, 0.6);
+            outline-offset: 4px;
+        }
+
+        .display-panel {
+            width: 100%;
+            min-height: 220px;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(22px);
+            padding: 0.9rem;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+            display: grid;
+            gap: 0.9rem;
+            text-align: left;
+        }
+
+        .panel-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: nowrap;
+        }
+
+        .panel-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            min-width: 0;
+            flex: 1 1 auto;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .volume-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+            max-width: 240px;
+        }
+
+        .volume-group label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .volume-range {
+            width: 100%;
+            appearance: none;
+            height: 8px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent) 0%, rgba(255, 59, 79, 0.2) 100%);
+            outline: none;
+        }
+
+        .track-meta {
+            display: grid;
+            gap: 0.35rem;
+        }
+
+        .track-info {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .artist-info {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+        }
+
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            align-items: center;
+        }
+
+        .meta-row span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .meta-row span:not(:first-child)::before {
+            content: '•';
+            color: var(--accent);
+            font-size: 1rem;
+            line-height: 0;
+        }
+
+        .controls-row {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .search-input,
+        .file-button {
+            width: 100%;
+            padding: 0.95rem 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.18);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color var(--transition), background var(--transition);
+        }
+
+        .search-input:focus,
+        .file-button:hover {
+            border-color: rgba(255, 59, 79, 0.45);
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .file-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .spectrum-canvas {
+            width: 100%;
+            height: 100px;
+            border-radius: 22px;
+            background: rgba(16, 8, 12, 0.75);
+            border: 1px solid rgba(255, 0, 15, 0.18);
+            box-shadow: inset 0 0 35px rgba(255, 0, 15, 0.14);
+            display: block;
+            margin-top: 0.35rem;
+        }
+
+
+        @media (max-width: 420px), (max-height: 760px) {
+            body { padding: 0.6rem; }
+            .app-shell { width: 100%; gap: 0.85rem; }
+            .card { padding: 1rem 0.85rem 0.75rem; }
+            .menu-container { height: 260px; margin-bottom: 0.9rem; }
+            .central-dimmer { width: 140px; height: 140px; }
+            .dimmer-inner { width: 88px; height: 88px; }
+            .menu-item { width: 44px; height: 44px; font-size: 1rem; }
+            .display-panel { padding: 0.75rem; gap: 0.65rem; }
+            .panel-title { font-size: 0.72rem; }
+            .volume-group { max-width: 220px; }
+            .track-info { font-size: 0.98rem; }
+            .artist-info { font-size: 0.84rem; }
+            .meta-row { gap: 0.55rem; font-size: 0.78rem; }
+            .spectrum-canvas { height: 84px; margin-top: 0.3rem; }
+            .equalizer-panel { margin-top: 0.85rem; padding: 0.7rem; }
+            .equalizer-header { font-size: 0.72rem; margin-bottom: 0.5rem; }
+            .eq-slider span { font-size: 0.72rem; }
+            .eq-slider output { font-size: 0.72rem; }
+        }
+    </style>
+</head>
+<body>
+    <main class="app-shell">
+        <div class="app-header">
+            <div class="app-title">CYBER AUDIO PRO  </div>
+            <button id="themeBtn" class="icon-button" type="button" aria-label="Alternar tema">Tema claro</button>
+        </div>
+        <section class="card">
+            <div class="menu-container" aria-label="Controles do player">
+                <button class="menu-item active" data-action="home" title="Playlist" aria-label="Playlist">♫</button>
+                <button class="menu-item" data-action="search" title="Buscar" aria-label="Buscar">🔎</button>
+                <button class="menu-item" data-action="next" title="Próxima faixa" aria-label="Próxima faixa">⏭</button>
+                <button class="menu-item" data-action="repeat" title="Repetir" aria-label="Repetir">🔁</button>
+                <button class="menu-item" data-action="shuffle" title="Aleatório" aria-label="Aleatório">🔀</button>
+                <button class="menu-item" data-action="back" title="Voltar faixa" aria-label="Voltar faixa">⏮</button>
+                <div class="central-dimmer" id="dimmer" aria-live="polite">
+                    <div class="dimmer-inner">
+                        <div class="led-indicator" id="led"></div>
+                        <button class="center-play-btn" id="playBtn" type="button" aria-label="Tocar">⏸</button>
+                    </div>
+                </div>
+            </div>
+            <div class="display-panel" id="panel">
+                <div class="panel-row">
+                    <div class="panel-title" id="panelTitle">Agora tocando</div>
+                    <div class="volume-group">
+                        <label for="volumeRange">Volume</label>
+                        <input id="volumeRange" class="volume-range" type="range" min="0" max="100" value="75" aria-label="Controle de volume">
+                    </div>
+                </div>
+                <div class="track-meta">
+                    <div class="track-info" id="trackName">Nenhuma música carregada</div>
+                    <div class="artist-info" id="artistName">Use o botão abaixo para adicionar faixas locais</div>
+                </div>
+                <div class="meta-row">
+                    <span id="trackAlbum">Sem álbum</span>
+                    <span id="trackTime">00:00</span>
+                    <span id="trackDuration">00:00</span>
+                </div>
+                <div class="controls-row">
+                    <label for="trackFiles" class="file-button" aria-label="Adicionar músicas locais">Adicionar músicas da pasta</label>
+                    <input id="trackFiles" type="file" accept="audio/*" multiple hidden>
+                </div>
+                <canvas id="spectrumCanvas" class="spectrum-canvas" aria-label="Visualizador de espectro de áudio"></canvas>
+            </div>
+        </section>
+    </main>
+    <script>
+        const playlist = [];
+        const menuButtons = document.querySelectorAll('.menu-item');
+        const playBtn = document.getElementById('playBtn');
+        const themeBtn = document.getElementById('themeBtn');
+        const led = document.getElementById('led');
+        const panelTitle = document.getElementById('panelTitle');
+        const trackName = document.getElementById('trackName');
+        const artistName = document.getElementById('artistName');
+        const trackAlbum = document.getElementById('trackAlbum');
+        const trackTime = document.getElementById('trackTime');
+        const trackDuration = document.getElementById('trackDuration');
+        const trackFiles = document.getElementById('trackFiles');
+        const volumeRange = document.getElementById('volumeRange');
+        const spectrumCanvas = document.getElementById('spectrumCanvas');
+
+        const equalizerBands = [
+            { label: 'Graves', type: 'lowshelf', freq: 120, gain: 0, min: -12, max: 12 },
+            { label: 'Médios', type: 'peaking', freq: 1000, gain: 0, Q: 1, min: -12, max: 12 },
+            { label: 'Agudos', type: 'highshelf', freq: 6000, gain: 0, min: -12, max: 12 }
+        ];
+        let lowShelfFilter, midPeakingFilter, highShelfFilter;
+
+        const audio = new Audio();
+        audio.crossOrigin = 'anonymous';
+        audio.volume = 0.75;
+
+        let audioContext;
+        let analyser;
+        let sourceNode;
+        let dataArray;
+        let animationId;
+        let currentTrackIndex = -1;
+        let isPlaying = false;
+        let isShuffle = false;
+        let isRepeat = false;
+        let isLightTheme = false;
+        let currentLedAngle = 0;
+
+        function initAudioGraph() {
+            if (audioContext) return;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            sourceNode = audioContext.createMediaElementSource(audio);
+
+            lowShelfFilter = audioContext.createBiquadFilter();
+            lowShelfFilter.type = 'lowshelf';
+            lowShelfFilter.frequency.value = equalizerBands[0].freq;
+            lowShelfFilter.gain.value = equalizerBands[0].gain;
+
+            midPeakingFilter = audioContext.createBiquadFilter();
+            midPeakingFilter.type = 'peaking';
+            midPeakingFilter.frequency.value = equalizerBands[1].freq;
+            midPeakingFilter.Q.value = equalizerBands[1].Q;
+            midPeakingFilter.gain.value = equalizerBands[1].gain;
+
+            highShelfFilter = audioContext.createBiquadFilter();
+            highShelfFilter.type = 'highshelf';
+            highShelfFilter.frequency.value = equalizerBands[2].freq;
+            highShelfFilter.gain.value = equalizerBands[2].gain;
+
+            sourceNode.connect(lowShelfFilter);
+            lowShelfFilter.connect(midPeakingFilter);
+            midPeakingFilter.connect(highShelfFilter);
+
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 1024;
+            highShelfFilter.connect(analyser);
+            analyser.connect(audioContext.destination);
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+            drawSpectrum();
+        }
+
+        function setActiveButton(action) {
+            menuButtons.forEach(button => button.classList.toggle('active', button.dataset.action === action));
+        }
+
+        function setLedDirection(action) {
+            const ledDirections = {
+                home: 0,
+                search: 90,
+                next: 135,
+                repeat: 180,
+                shuffle: 225,
+                back: -90
+            };
+            currentLedAngle = ledDirections[action] ?? currentLedAngle;
+        }
+
+        function selectTrack(index, playImmediately = false) {
+            if (!playlist[index]) return;
+            currentTrackIndex = index;
+            const track = playlist[index];
+            trackName.textContent = track.title;
+            artistName.textContent = track.artist;
+            trackAlbum.textContent = track.album || 'Arquivo local';
+            trackTime.textContent = '00:00';
+            trackDuration.textContent = track.duration || '00:00';
+            panelTitle.textContent = track.title;
+            setActiveButton('home');
+            setLedDirection('home');
+
+            if (track.url) {
+                audio.src = track.url;
+                audio.load();
+                if (playImmediately) {
+                    resumeAudioContext().then(() => audio.play().catch(() => {}));
+                    isPlaying = true;
+                    playBtn.textContent = '⏸';
+                }
+            }
+        }
+
+        function updateTrackInfo() {
+            if (!playlist[currentTrackIndex]) return;
+            const track = playlist[currentTrackIndex];
+            trackAlbum.textContent = track.album || 'Arquivo local';
+            trackDuration.textContent = track.duration || '00:00';
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const rest = String(Math.floor(seconds % 60)).padStart(2, '0');
+            return `${minutes}:${rest}`;
+        }
+
+        function updatePlaybackTime() {
+            if (!playlist[currentTrackIndex]) return;
+            trackTime.textContent = formatTime(audio.currentTime);
+            if (!audio.duration || Number.isNaN(audio.duration)) return;
+            trackDuration.textContent = formatTime(audio.duration);
+        }
+
+        async function resumeAudioContext() {
+            if (!audioContext) initAudioGraph();
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+        }
+
+        function togglePlay() {
+            if (currentTrackIndex < 0 || !playlist[currentTrackIndex]?.url) {
+                if (playlist.length) {
+                    selectTrack(0, true);
+                    return;
+                }
+                return;
+            }
+            resumeAudioContext();
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                audio.play().catch(() => {});
+                playBtn.textContent = '⏸';
+            } else {
+                audio.pause();
+                playBtn.textContent = '▶';
+            }
+        }
+
+        function changeTrack(direction) {
+            if (!playlist.length) return;
+            if (isShuffle) {
+                currentTrackIndex = Math.floor(Math.random() * playlist.length);
+            } else {
+                currentTrackIndex += direction;
+                if (currentTrackIndex >= playlist.length) currentTrackIndex = 0;
+                if (currentTrackIndex < 0) currentTrackIndex = playlist.length - 1;
+            }
+            selectTrack(currentTrackIndex, isPlaying);
+        }
+
+        function updateSpectrum() {
+            if (!analyser) return;
+            analyser.getByteFrequencyData(dataArray);
+            const canvas = spectrumCanvas;
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            ctx.clearRect(0, 0, width, height);
+
+            const barCount = 64;
+            const barWidth = Math.max(2, width / barCount);
+            const center = height / 2;
+            const maxHeight = height * 0.42;
+
+            for (let i = 0; i < barCount; i++) {
+                const value = dataArray[Math.floor(i * dataArray.length / barCount)];
+                const barHeight = (value / 255) * maxHeight;
+                const x = i * barWidth + (barWidth * 0.1);
+                const gradient = ctx.createLinearGradient(0, center - barHeight, 0, center + barHeight);
+                gradient.addColorStop(0, 'rgba(255, 90, 110, 0.95)');
+                gradient.addColorStop(0.4, 'rgba(255, 10, 30, 0.95)');
+                gradient.addColorStop(1, 'rgba(255, 0, 15, 0.25)');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, center - barHeight, barWidth * 0.8, barHeight * 2);
+            }
+
+            const energy = Math.max(...dataArray) / 255;
+            const rotation = currentLedAngle + (energy > 0.75 ? 8 : 0);
+            led.style.opacity = energy > 0.15 ? '1' : '0.55';
+            led.style.transform = `rotate(${rotation}deg)`;
+        }
+
+        function drawSpectrum() {
+            if (!spectrumCanvas) return;
+            const dpr = window.devicePixelRatio || 1;
+            spectrumCanvas.width = spectrumCanvas.clientWidth * dpr;
+            spectrumCanvas.height = spectrumCanvas.clientHeight * dpr;
+            const ctx = spectrumCanvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            updateSpectrum();
+            animationId = requestAnimationFrame(drawSpectrum);
+        }
+
+        function setTheme(light) {
+            document.body.classList.toggle('light', light);
+            themeBtn.textContent = light ? 'Tema escuro' : 'Tema claro';
+            isLightTheme = light;
+        }
+
+        function createEqualizerUI() {
+            const style = document.createElement('style');
+            style.textContent = `
+                .equalizer-panel { margin-top: 0.9rem; padding: 0.75rem; border-radius: 20px; background: rgba(255, 0, 15, 0.08); border: 1px solid rgba(255, 0, 15, 0.18); box-shadow: inset 0 0 24px rgba(255, 0, 15, 0.08); }
+                .equalizer-header { font-size: 0.76rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.6rem; }
+                .equalizer-controls { display: grid; gap: 0.8rem; }
+                .eq-slider { display: grid; gap: 0.25rem; }
+                .eq-slider span { font-size: 0.78rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.8px; }
+                .eq-slider input[type=range] { width: 100%; accent-color: #ff0030; height: 4px; }
+                .eq-slider output { color: var(--text-muted); font-size: 0.74rem; }
+                .equalizer-footer { margin-top: 0.75rem; font-size: 0.78rem; color: var(--text-muted); text-align: center; }
+            `;
+            document.head.appendChild(style);
+
+            const equalizerPanel = document.createElement('div');
+            equalizerPanel.className = 'equalizer-panel';
+            equalizerPanel.innerHTML = `
+                <div class="equalizer-header">Equalizador Avançado</div>
+                <div class="equalizer-controls">
+                    ${equalizerBands.map((band, index) => `
+                        <label class="eq-slider">
+                            <span>${band.label} (${band.freq}Hz)</span>
+                            <input type="range" min="${band.min}" max="${band.max}" value="${band.gain}" data-band="${index}">
+                            <output>${band.gain} dB</output>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="equalizer-footer">Feito por: Natanael Teixeira</div>
+            `;
+
+            spectrumCanvas.insertAdjacentElement('afterend', equalizerPanel);
+
+            equalizerPanel.querySelectorAll('input[type=range]').forEach(input => {
+                const output = input.nextElementSibling;
+                input.addEventListener('input', event => {
+                    const bandIndex = Number(event.target.dataset.band);
+                    const gainValue = Number(event.target.value);
+                    equalizerBands[bandIndex].gain = gainValue;
+                    output.textContent = `${gainValue} dB`;
+
+                    if (bandIndex === 0) lowShelfFilter.gain.value = gainValue;
+                    if (bandIndex === 1) midPeakingFilter.gain.value = gainValue;
+                    if (bandIndex === 2) highShelfFilter.gain.value = gainValue;
+                });
+            });
+        }
+
+        function showPanelMessage(message) {
+            panelTitle.textContent = message;
+        }
+
+        menuButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const action = button.dataset.action;
+                setLedDirection(action);
+                if (action === 'next') {
+                    changeTrack(1);
+                    showPanelMessage('Próxima faixa');
+                    return;
+                }
+                if (action === 'back') {
+                    changeTrack(-1);
+                    showPanelMessage('Faixa anterior');
+                    return;
+                }
+                if (action === 'repeat') {
+                    isRepeat = !isRepeat;
+                    button.classList.toggle('highlighted', isRepeat);
+                    audio.loop = isRepeat;
+                    showPanelMessage(isRepeat ? 'Repetir ativado' : 'Repetir desativado');
+                    return;
+                }
+                if (action === 'shuffle') {
+                    isShuffle = !isShuffle;
+                    button.classList.toggle('highlighted', isShuffle);
+                    showPanelMessage(isShuffle ? 'Aleatório ativado' : 'Aleatório desativado');
+                    return;
+                }
+                setActiveButton(action);
+                if (action === 'search') {
+                    panelTitle.textContent = 'Buscar música';
+                } else {
+                    showPanelMessage('Agora tocando');
+                }
+            });
+        });
+
+        trackFiles.addEventListener('change', (event) => {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
+
+            files.forEach(file => {
+                const url = URL.createObjectURL(file);
+                playlist.push({
+                    title: file.name.replace(/\.[^/.]+$/, ''),
+                    artist: 'Música local',
+                    album: 'Minha pasta',
+                    duration: '00:00',
+                    url,
+                    file
+                });
+            });
+
+            if (currentTrackIndex < 0) currentTrackIndex = 0;
+            selectTrack(currentTrackIndex, false);
+            showPanelMessage('Músicas locais carregadas');
+        });
+
+        volumeRange.addEventListener('input', event => {
+            audio.volume = event.target.value / 100;
+        });
+
+        audio.addEventListener('loadedmetadata', () => {
+            if (!playlist[currentTrackIndex]) return;
+            const duration = formatTime(audio.duration);
+            playlist[currentTrackIndex].duration = duration;
+            trackDuration.textContent = duration;
+            trackTime.textContent = formatTime(0);
+        });
+
+        audio.addEventListener('timeupdate', updatePlaybackTime);
+
+        audio.addEventListener('ended', () => {
+            if (!isRepeat) changeTrack(1);
+        });
+
+        playBtn.addEventListener('click', togglePlay);
+        themeBtn.addEventListener('click', () => setTheme(!isLightTheme));
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTheme(false);
+            initAudioGraph();
+            createEqualizerUI();
+            updateSpectrum();
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(() => console.log('Service Worker registrado com sucesso.'))
+                    .catch(err => console.warn('Falha ao registrar Service Worker:', err));
+            }
+        });
+    </script>
+</body>
+</html>
