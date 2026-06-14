@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#050608">
     <link rel="manifest" href="manifest.json">
     <title>Cyber Audio Glass</title>
@@ -14,12 +14,14 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         :root {
             --bg-900: #050608;
             --bg-850: #0c1016;
-            --surface: rgba(255, 255, 255, 0.06);
+            --surface: rgba(255, 255, 255, 0.04);
             --surface-strong: rgba(255, 255, 255, 0.12);
             --text-primary: #f8f8f9;
             --text-muted: #a0a8b8;
@@ -27,14 +29,14 @@
             --accent-soft: rgba(255, 0, 15, 0.24);
             --accent-strong: #ff2542;
             --shadow: 0 32px 90px rgba(0, 0, 0, 0.36);
-            --transition: 0.24s ease;
+            --transition: 0.22s ease;
         }
 
         body.light {
             --bg-900: #ffffff;
             --bg-850: #ffffff;
-            --surface: rgba(255, 255, 255, 0.95);
-            --surface-strong: rgba(255, 255, 255, 1);
+            --surface: rgba(0, 0, 0, 0.04);
+            --surface-strong: rgba(0, 0, 0, 0.08);
             --text-primary: #111827;
             --text-muted: #6b7280;
             --accent: #d7263d;
@@ -43,16 +45,10 @@
             --shadow: 0 32px 70px rgba(0, 0, 0, 0.12);
         }
 
-        html {
-            min-height: 100%;
-            overflow-x: hidden;
-        }
-
         body {
             min-height: 100vh;
-            height: auto;
-            overflow-x: hidden;
-            overflow-y: auto;
+            height: 100vh;
+            overflow: hidden;
             font-family: 'Inter', sans-serif;
             color: var(--text-primary);
             background: radial-gradient(circle at top, rgba(255, 59, 79, 0.12), transparent 18%),
@@ -60,26 +56,18 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 1.5rem;
+            padding: 1rem;
             transition: background var(--transition), color var(--transition);
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at 85% 20%, rgba(255, 0, 15, 0.20), transparent 12%),
-                        radial-gradient(circle at 20% 90%, rgba(255, 255, 255, 0.06), transparent 18%);
-            pointer-events: none;
-            z-index: 0;
         }
 
         .app-shell {
             position: relative;
             width: 100%;
-            max-width: 960px; /* Expandido para acomodar o modo desktop lado a lado */
-            display: grid;
-            gap: 1.2rem;
+            max-width: 960px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
             z-index: 1;
             margin: 0 auto;
         }
@@ -88,72 +76,65 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
-            width: 100%;
+            height: 40px;
+            flex-shrink: 0;
         }
 
         .app-title {
             font-size: 0.95rem;
             font-weight: 700;
-            letter-spacing: 8px;
+            letter-spacing: 6px;
             text-transform: uppercase;
             color: var(--accent);
             text-shadow: 0 0 24px rgba(255, 59, 79, 0.18);
         }
 
         .icon-button {
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(255, 59, 79, 0.12);
             color: var(--text-primary);
             border-radius: 12px;
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 1rem;
             cursor: pointer;
             font-size: 0.85rem;
             font-weight: 600;
             transition: background var(--transition), transform var(--transition);
         }
 
-        .icon-button:hover {
-            transform: translateY(-1px);
-            background: rgba(255, 59, 79, 0.18);
-        }
-
-        /* CARD PRINCIPAL COM RESPONSIVIDADE MULTI-COLUNA */
+        /* CARD PRINCIPAL COM RESPONSIVIDADE EM ALTURA */
         .card {
             position: relative;
+            flex: 1;
             border-radius: 28px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--surface);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             box-shadow: var(--shadow);
             padding: 1.5rem;
             overflow: hidden;
             display: grid;
-            grid-template-columns: 1fr 1.2fr; /* Divisão perfeita para computadores e tablets */
+            grid-template-columns: 1fr 1.2fr;
             gap: 2rem;
-            align-items: start;
-            transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+            align-items: center;
         }
 
-        .card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent 58%);
-            pointer-events: none;
+        /* CONTÊINER DO DISCO */
+        .menu-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
         }
 
-        /* CONTÊINER DO DISCO/MENU CIRCULAR */
         .menu-container {
             position: relative;
             width: 100%;
-            max-width: 340px;
+            max-width: 320px;
             aspect-ratio: 1 / 1;
-            margin: auto;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(24px);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -162,70 +143,60 @@
 
         .menu-item {
             position: absolute;
-            width: 44px;
-            height: 44px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text-muted);
             font-size: 1rem;
             border: 1px solid transparent;
             display: grid;
             place-items: center;
             cursor: pointer;
-            transition: transform var(--transition), background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition);
+            transition: all var(--transition);
         }
 
-        .menu-item:hover,
-        .menu-item:focus-visible {
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.15);
-            outline: none;
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.12);
         }
 
         .menu-item.active {
             color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.18);
-            border-color: rgba(255, 0, 15, 0.6);
-            box-shadow: 0 12px 24px rgba(255, 0, 15, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 0, 15, 0.4);
         }
 
         .menu-item.highlighted {
-            color: #ff162b;
-            text-shadow: 0 0 16px rgba(255, 22, 43, 0.85);
+            color: #ff8c00;
+            background: rgba(255, 140, 0, 0.15);
+            border-color: rgba(255, 140, 0, 0.5);
+            text-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
         }
 
-        /* Posicionamento radial preciso dos botões */
-        .menu-item:nth-child(1) { top: 12px; left: calc(50% - 22px); }
-        .menu-item:nth-child(2) { top: 56px; right: 16px; }
-        .menu-item:nth-child(3) { bottom: 56px; right: 16px; }
-        .menu-item:nth-child(4) { bottom: 12px; left: calc(50% - 22px); }
-        .menu-item:nth-child(5) { bottom: 56px; left: 16px; }
-        .menu-item:nth-child(6) { top: 56px; left: 16px; }
+        /* Posicionamento radial preciso */
+        .menu-item:nth-child(1) { top: 12px; left: calc(50% - 21px); }
+        .menu-item:nth-child(2) { top: 52px; right: 16px; }
+        .menu-item:nth-child(3) { bottom: 52px; right: 16px; }
+        .menu-item:nth-child(4) { bottom: 12px; left: calc(50% - 21px); }
+        .menu-item:nth-child(5) { bottom: 52px; left: 16px; }
+        .menu-item:nth-child(6) { top: 52px; left: 16px; }
 
         .central-dimmer {
-            position: relative;
-            width: 130px;
-            height: 130px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            background: rgba(18, 12, 16, 0.34);
-            border: 1px solid rgba(255, 0, 15, 0.2);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 12px 24px rgba(255, 0, 15, 0.15);
+            background: #161314;
+            border: 2px solid rgba(255, 30, 58, 0.15);
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.8), 0 0 20px rgba(255, 30, 58, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform var(--transition);
-        }
-
-        .central-dimmer:hover {
-            transform: translateY(-2px);
+            position: relative;
         }
 
         .dimmer-inner {
-            width: 106px;
-            height: 106px;
-            border-radius: 50%;
-            background: rgba(18, 14, 20, 0.92);
-            border: 1px solid rgba(255, 0, 15, 0.15);
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -233,74 +204,59 @@
         }
 
         .center-play-btn {
-            width: 100%;
-            height: 100%;
+            width: 50px;
+            height: 50px;
             border: none;
-            background: transparent;
-            color: var(--text-primary);
-            font-size: 0;
+            border-radius: 14px;
+            background: #ff8c00;
+            color: #ffffff;
             cursor: pointer;
             display: grid;
             place-items: center;
-            transition: transform var(--transition), color var(--transition);
-        }
-
-        .center-play-btn:hover,
-        .center-play-btn:focus-visible {
-            color: #ff0018;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.4);
+            transition: transform var(--transition);
         }
 
         .center-play-btn .play-icon {
-            display: inline-block;
-            width: 1.2em;
-            height: 1.2em;
-            position: relative;
-        }
-
-        .center-play-btn .play-icon::before {
-            content: '';
-            position: absolute;
-            inset: 0;
+            display: block;
+            width: 0;
+            height: 0;
             border-style: solid;
-            border-width: 0.6em 0 0.6em 1.1em;
-            border-color: transparent transparent transparent currentColor;
-            transform: translateX(0.05em);
+            border-width: 8px 0 8px 14px;
+            border-color: transparent transparent transparent #ffffff;
+            transform: translateX(2px);
         }
 
-        .center-play-btn.playing .play-icon::before {
+        .center-play-btn.playing .play-icon {
             border: none;
-            width: 0.28em;
-            height: 1.1em;
-            left: calc(50% - 0.26em);
-            top: 0;
-            background: currentColor;
-            box-shadow: -0.5em 0 0 currentColor;
-            transform: none;
+            width: 14px;
+            height: 16px;
+            background: #ffffff;
+            box-shadow: -6px 0 0 #ffffff, 6px 0 0 #ffffff;
+            transform: scaleX(0.4);
         }
 
         .led-indicator {
             position: absolute;
-            top: 14px;
+            top: 10px;
             left: calc(50% - 2px);
             width: 4px;
-            height: 18px;
+            height: 14px;
             border-radius: 999px;
             background: linear-gradient(180deg, #ff5d6d 0%, #ff0018 100%);
-            box-shadow: 0 0 20px rgba(255, 0, 15, 0.8);
-            transform-origin: center 39px;
-            transition: transform 0.2s ease, opacity var(--transition);
+            box-shadow: 0 0 12px rgba(255, 0, 15, 0.8);
+            transform-origin: center 50px;
+            transition: transform 0.15s ease;
         }
 
-        .center-play-btn:active {
-            transform: scale(0.96);
-        }
-
-        /* PAINEL DE INFORMAÇÕES DA MÚSICA */
+        /* PAINEL DE INFORMAÇÕES */
         .display-panel {
             width: 100%;
-            display: grid;
-            gap: 1.2rem;
-            text-align: left;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 0.8rem;
         }
 
         .panel-row {
@@ -311,225 +267,256 @@
         }
 
         .panel-title {
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--accent);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .volume-group {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            width: 100%;
-            max-width: 200px;
+            gap: 0.5rem;
+            flex: 1;
+            max-width: 180px;
         }
 
         .volume-group label {
             font-size: 0.75rem;
             color: var(--text-muted);
-            text-transform: uppercase;
         }
 
         .volume-range {
             width: 100%;
             appearance: none;
-            height: 6px;
+            -webkit-appearance: none;
+            height: 5px;
             border-radius: 999px;
             background: rgba(255, 255, 255, 0.1);
             outline: none;
-            accent-color: var(--accent);
+        }
+
+        .volume-range::-webkit-slider-runnable-track {
+            height: 5px;
+            background: linear-gradient(to right, var(--accent) var(--seek-before-width, 75%), rgba(255,255,255,0.1) var(--seek-before-width, 75%));
+            border-radius: 999px;
+        }
+
+        .volume-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: #0076ff;
+            margin-top: -3.5px;
+            box-shadow: 0 0 8px rgba(0, 118, 255, 0.6);
         }
 
         .track-meta {
             display: grid;
-            gap: 0.35rem;
+            gap: 0.2rem;
         }
 
         .track-info {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 700;
             color: var(--text-primary);
-            line-height: 1.3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .artist-info {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .meta-row {
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
+            gap: 0.6rem;
             color: var(--text-muted);
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             align-items: center;
-        }
-
-        .meta-row span {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-variant-numeric: tabular-nums;
         }
 
         .meta-row span:not(:first-child)::before {
             content: '•';
             color: var(--accent);
-            font-size: 1rem;
-            line-height: 0;
+            margin-right: 0.6rem;
         }
 
-        .controls-row {
-            display: grid;
-            gap: 0.85rem;
-        }
-
-        .search-input,
         .file-button {
             width: 100%;
-            padding: 0.85rem 1.2rem;
-            border-radius: 12px;
+            padding: 0.75rem;
+            border-radius: 14px;
             border: 1px solid rgba(255, 255, 255, 0.06);
-            background: rgba(0, 0, 0, 0.25);
+            background: rgba(0, 0, 0, 0.2);
             color: var(--text-primary);
             font-size: 0.9rem;
-            outline: none;
+            font-weight: 600;
             text-align: center;
-            transition: border-color var(--transition), background var(--transition);
-        }
-
-        .search-input:focus,
-        .file-button:hover {
-            border-color: rgba(255, 59, 79, 0.45);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .file-button {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
+            display: block;
             cursor: pointer;
-            user-select: none;
+            transition: all var(--transition);
+        }
+
+        .file-button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 59, 79, 0.3);
         }
 
         .spectrum-canvas {
             width: 100%;
-            height: 90px;
-            border-radius: 16px;
-            background: rgba(10, 6, 8, 0.5);
-            border: 1px solid rgba(255, 0, 15, 0.12);
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(10, 6, 8, 0.4);
+            border: 1px solid rgba(255, 0, 15, 0.08);
             display: block;
         }
 
-        /* ---------------------------------------------------------------- */
-        /* MEDIA QUERIES: ADAPTAÇÕES DINÂMICAS PARA TABLETS E SMARTPHONES */
-        /* ---------------------------------------------------------------- */
-
-        /* Tablets e Telas Médias Menores (Quebra de coluna para linha única) */
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-
-            .card {
-                grid-template-columns: 1fr; /* Muda para uma coluna vertical */
-                gap: 1.5rem;
-                padding: 1.2rem;
-            }
-
-            .menu-container {
-                max-width: 290px; /* Reduz levemente o disco para telas médias */
-            }
-
-            .menu-item {
-                width: 38px;
-                height: 38px;
-                font-size: 0.9rem;
-            }
-
-            .menu-item:nth-child(1) { left: calc(50% - 19px); top: 10px; }
-            .menu-item:nth-child(2) { top: 48px; right: 12px; }
-            .menu-item:nth-child(3) { bottom: 48px; right: 12px; }
-            .menu-item:nth-child(4) { left: calc(50% - 19px); bottom: 10px; }
-            .menu-item:nth-child(5) { bottom: 48px; left: 12px; }
-            .menu-item:nth-child(6) { top: 48px; left: 12px; }
-
-            .central-dimmer { width: 116px; height: 116px; }
-            .dimmer-inner { width: 92px; height: 92px; }
-            .led-indicator { transform-origin: center 32px; top: 12px; }
+        /* EQUALIZADOR INTEGRADO SEM TRANSBORDAR */
+        .equalizer-panel {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 0.6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
         }
 
-        /* Celulares Comuns e Telas Pequenas */
-        @media (max-width: 480px) {
-            .app-header {
-                flex-direction: row;
-                justify-content: space-between;
-            }
+        .equalizer-header {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-            .app-title {
-                font-size: 0.8rem;
-                letter-spacing: 4px;
-            }
+        .equalizer-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
 
-            .icon-button {
-                padding: 0.5rem 0.8rem;
-                font-size: 0.75rem;
+        .eq-slider {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .eq-slider .eq-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+        }
+
+        .eq-slider span {
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .eq-slider output {
+            color: var(--text-muted);
+        }
+
+        .eq-slider input[type=range] {
+            width: 100%;
+            appearance: none;
+            -webkit-appearance: none;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .eq-slider input[type=range]::-webkit-slider-runnable-track {
+            height: 4px;
+            background: linear-gradient(to right, var(--accent) 50%, rgba(255,255,255,0.1) 50%);
+            border-radius: 2px;
+        }
+
+        .eq-slider input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            margin-top: -4px;
+            box-shadow: 0 0 6px var(--accent-soft);
+        }
+
+        /* INTERFACE ADAPTÁVEL MOBILE (FLUIDEZ VERTICAL) */
+        @media (max-width: 768px) {
+            body {
+                overflow: hidden;
             }
 
             .card {
-                padding: 1rem 0.8rem;
-                border-radius: 20px;
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                padding: 1rem;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                overflow: hidden;
+            }
+
+            .menu-section {
+                flex: 1.1;
+                min-height: 180px;
             }
 
             .menu-container {
-                max-width: 250px;
+                max-width: 240px;
             }
 
             .menu-item {
-                width: 34px;
-                height: 34px;
+                width: 36px;
+                height: 36px;
                 font-size: 0.85rem;
             }
 
-            .menu-item:nth-child(1) { left: calc(50% - 17px); top: 8px; }
-            .menu-item:nth-child(2) { top: 40px; right: 8px; }
-            .menu-item:nth-child(3) { bottom: 40px; right: 8px; }
-            .menu-item:nth-child(4) { left: calc(50% - 17px); bottom: 8px; }
-            .menu-item:nth-child(5) { bottom: 40px; left: 8px; }
-            .menu-item:nth-child(6) { top: 40px; left: 8px; }
+            .menu-item:nth-child(1) { left: calc(50% - 18px); top: 8px; }
+            .menu-item:nth-child(2) { top: 42px; right: 10px; }
+            .menu-item:nth-child(3) { bottom: 42px; right: 10px; }
+            .menu-item:nth-child(4) { bottom: 8px; left: calc(50% - 18px); }
+            .menu-item:nth-child(5) { bottom: 42px; left: 10px; }
+            .menu-item:nth-child(6) { top: 42px; left: 10px; }
 
             .central-dimmer { width: 100px; height: 100px; }
-            .dimmer-inner { width: 78px; height: 78px; }
-            .led-indicator { transform-origin: center 27px; top: 10px; height: 14px; }
+            .center-play-btn { width: 42px; height: 42px; border-radius: 10px; }
+            .led-indicator { transform-origin: center 40px; top: 10px; height: 12px; }
 
-            .panel-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.6rem;
+            .display-panel {
+                flex: 1.2;
+                justify-content: space-between;
+                gap: 0.5rem;
             }
 
-            .volume-group {
-                max-width: 100%;
-            }
+            .track-info { font-size: 1.1rem; }
+            .artist-info { font-size: 0.85rem; }
+            .file-button { padding: 0.6rem; font-size: 0.85rem; }
+            .spectrum-canvas { height: 40px; }
+        }
 
-            .track-info {
-                font-size: 1.05rem;
-            }
-
-            .artist-info {
-                font-size: 0.85rem;
-            }
-
-            .spectrum-canvas {
-                height: 70px;
-            }
+        /* PROTEÇÃO EXTRA PARA TELAS MUITO CURTAS */
+        @media (max-height: 660px) and (max-width: 768px) {
+            .menu-section { min-height: 140px; }
+            .menu-container { max-width: 190px; }
+            .menu-item { width: 30px; height: 30px; font-size: 0.75rem; }
+            .menu-item:nth-child(1) { left: calc(50% - 15px); top: 4px; }
+            .menu-item:nth-child(2) { top: 32px; right: 6px; }
+            .menu-item:nth-child(3) { bottom: 32px; right: 6px; }
+            .menu-item:nth-child(4) { bottom: 4px; left: calc(50% - 15px); }
+            .menu-item:nth-child(5) { bottom: 32px; left: 6px; }
+            .menu-item:nth-child(6) { top: 32px; left: 6px; }
+            .central-dimmer { width: 80px; height: 80px; }
+            .center-play-btn { width: 34px; height: 34px; }
+            .led-indicator { transform-origin: center 30px; top: 10px; height: 10px; }
+            .track-info { font-size: 1rem; }
+            .spectrum-canvas { height: 30px; }
         }
     </style>
 </head>
@@ -537,20 +524,22 @@
     <main class="app-shell">
         <div class="app-header">
             <div class="app-title">CYBER AUDIO PRO</div>
-            <button id="themeBtn" class="icon-button" type="button" aria-label="Alternar tema">Tema claro</button>
+            <button id="themeBtn" class="icon-button" type="button">Tema claro</button>
         </div>
         <section class="card">
-            <div class="menu-container" aria-label="Controles do player">
-                <button class="menu-item active" data-action="home" title="Playlist" aria-label="Playlist">♫</button>
-                <button class="menu-item" data-action="search" title="Buscar" aria-label="Buscar">🔎</button>
-                <button class="menu-item" data-action="next" title="Próxima faixa" aria-label="Próxima faixa">⏭</button>
-                <button class="menu-item" data-action="repeat" title="Repetir" aria-label="Repetir">🔁</button>
-                <button class="menu-item" data-action="shuffle" title="Aleatório" aria-label="Aleatório">🔀</button>
-                <button class="menu-item" data-action="back" title="Voltar faixa" aria-label="Voltar faixa">⏮</button>
-                <div class="central-dimmer" id="dimmer" aria-live="polite">
-                    <div class="dimmer-inner">
-                        <div class="led-indicator" id="led"></div>
-                        <button class="center-play-btn" id="playBtn" type="button" aria-label="Tocar"><span class="play-icon"></span></button>
+            <div class="menu-section">
+                <div class="menu-container">
+                    <button class="menu-item active" data-action="home" title="Playlist">♫</button>
+                    <button class="menu-item" data-action="search" title="Buscar">🔎</button>
+                    <button class="menu-item" data-action="next" title="Próxima faixa">⏭</button>
+                    <button class="menu-item" data-action="repeat" title="Repetir">🔁</button>
+                    <button class="menu-item" data-action="shuffle" title="Aleatório">🔀</button>
+                    <button class="menu-item" data-action="back" title="Voltar faixa">⏮</button>
+                    <div class="central-dimmer" id="dimmer">
+                        <div class="dimmer-inner">
+                            <div class="led-indicator" id="led"></div>
+                            <button class="center-play-btn" id="playBtn" type="button"><span class="play-icon"></span></button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -559,23 +548,29 @@
                     <div class="panel-title" id="panelTitle">Agora tocando</div>
                     <div class="volume-group">
                         <label for="volumeRange">Volume</label>
-                        <input id="volumeRange" class="volume-range" type="range" min="0" max="100" value="75" aria-label="Controle de volume">
+                        <input id="volumeRange" class="volume-range" type="range" min="0" max="100" value="75">
                     </div>
                 </div>
                 <div class="track-meta">
                     <div class="track-info" id="trackName">Nenhuma música carregada</div>
-                    <div class="artist-info" id="artistName">Use o botão abaixo para adicionar faixas locais</div>
+                    <div class="artist-info" id="artistName">Use o botão abaixo para adicionar faixas</div>
                 </div>
                 <div class="meta-row">
                     <span id="trackAlbum">Sem álbum</span>
                     <span id="trackTime">00:00</span>
                     <span id="trackDuration">00:00</span>
                 </div>
-                <div class="controls-row">
-                    <label for="trackFiles" class="file-button" aria-label="Adicionar músicas locais">Adicionar músicas da pasta</label>
+                <div>
+                    <label for="trackFiles" class="file-button">Adicionar músicas da pasta</label>
                     <input id="trackFiles" type="file" accept="audio/*" multiple hidden>
                 </div>
-                <canvas id="spectrumCanvas" class="spectrum-canvas" aria-label="Visualizador de espectro de áudio"></canvas>
+                <canvas id="spectrumCanvas" class="spectrum-canvas"></canvas>
+                
+                <!-- Painel Equalizador Unificado -->
+                <div class="equalizer-panel">
+                    <div class="equalizer-header">Equalizador Avançado</div>
+                    <div class="equalizer-controls" id="eqControls"></div>
+                </div>
             </div>
         </section>
     </main>
@@ -594,6 +589,7 @@
         const trackFiles = document.getElementById('trackFiles');
         const volumeRange = document.getElementById('volumeRange');
         const spectrumCanvas = document.getElementById('spectrumCanvas');
+        const eqControls = document.getElementById('eqControls');
 
         const equalizerBands = [
             { label: 'Graves', type: 'lowshelf', freq: 120, gain: 0, min: -12, max: 12 },
@@ -606,17 +602,8 @@
         audio.crossOrigin = 'anonymous';
         audio.volume = 0.75;
 
-        let audioContext;
-        let analyser;
-        let sourceNode;
-        let dataArray;
-        let animationId;
-        let currentTrackIndex = -1;
-        let isPlaying = false;
-        let isShuffle = false;
-        let isRepeat = false;
-        let isLightTheme = false;
-        let currentLedAngle = 0;
+        let audioContext, analyser, sourceNode, dataArray, animationId;
+        let currentTrackIndex = -1, isPlaying = false, isShuffle = false, isRepeat = false, isLightTheme = false, currentLedAngle = 0;
 
         function initAudioGraph() {
             if (audioContext) return;
@@ -644,7 +631,7 @@
             midPeakingFilter.connect(highShelfFilter);
 
             analyser = audioContext.createAnalyser();
-            analyser.fftSize = 1024;
+            analyser.fftSize = 512;
             highShelfFilter.connect(analyser);
             analyser.connect(audioContext.destination);
             dataArray = new Uint8Array(analyser.frequencyBinCount);
@@ -656,14 +643,7 @@
         }
 
         function setLedDirection(action) {
-            const ledDirections = {
-                home: 0,
-                search: 90,
-                next: 135,
-                repeat: 180,
-                shuffle: 225,
-                back: -90
-            };
+            const ledDirections = { home: 0, search: 90, next: 135, repeat: 180, shuffle: 225, back: -90 };
             currentLedAngle = ledDirections[action] ?? currentLedAngle;
         }
 
@@ -676,7 +656,7 @@
             trackAlbum.textContent = track.album || 'Arquivo local';
             trackTime.textContent = '00:00';
             trackDuration.textContent = track.duration || '00:00';
-            panelTitle.textContent = track.title;
+            panelTitle.textContent = "Tocando";
             setActiveButton('home');
             setLedDirection('home');
 
@@ -691,41 +671,29 @@
             }
         }
 
-        function updateTrackInfo() {
-            if (!playlist[currentTrackIndex]) return;
-            const track = playlist[currentTrackIndex];
-            trackAlbum.textContent = track.album || 'Arquivo local';
-            trackDuration.textContent = track.duration || '00:00';
-        }
-
         function formatTime(seconds) {
+            if (isNaN(seconds)) return "00:00";
             const minutes = Math.floor(seconds / 60);
             const rest = String(Math.floor(seconds % 60)).padStart(2, '0');
             return `${minutes}:${rest}`;
         }
 
         function updatePlaybackTime() {
-            if (!playlist[currentTrackIndex]) return;
             trackTime.textContent = formatTime(audio.currentTime);
-            if (!audio.duration || Number.isNaN(audio.duration)) return;
-            trackDuration.textContent = formatTime(audio.duration);
+            if (audio.duration) trackDuration.textContent = formatTime(audio.duration);
         }
 
         async function resumeAudioContext() {
             if (!audioContext) initAudioGraph();
-            if (audioContext.state === 'suspended') {
-                await audioContext.resume();
-            }
+            if (audioContext && audioContext.state === 'suspended') await audioContext.resume();
         }
 
         function togglePlay() {
-            if (currentTrackIndex < 0 || !playlist[currentTrackIndex]?.url) {
-                if (playlist.length) {
-                    selectTrack(0, true);
-                    return;
-                }
+            if (currentTrackIndex < 0 && playlist.length) {
+                selectTrack(0, true);
                 return;
             }
+            if (currentTrackIndex < 0) return;
             resumeAudioContext();
             isPlaying = !isPlaying;
             if (isPlaying) {
@@ -749,175 +717,109 @@
             selectTrack(currentTrackIndex, isPlaying);
         }
 
-        function updateSpectrum() {
+        function drawSpectrum() {
             if (!analyser) return;
             analyser.getByteFrequencyData(dataArray);
-            const canvas = spectrumCanvas;
-            const ctx = canvas.getContext('2d');
-            const width = canvas.width;
-            const height = canvas.height;
+            const ctx = spectrumCanvas.getContext('2d');
+            const width = spectrumCanvas.width = spectrumCanvas.clientWidth;
+            const height = spectrumCanvas.height = spectrumCanvas.clientHeight;
             ctx.clearRect(0, 0, width, height);
 
-            const barCount = 64;
-            const barWidth = Math.max(2, width / barCount);
+            const barCount = 32;
+            const barWidth = width / barCount;
             const center = height / 2;
-            const maxHeight = height * 0.42;
 
             for (let i = 0; i < barCount; i++) {
                 const value = dataArray[Math.floor(i * dataArray.length / barCount)];
-                const barHeight = (value / 255) * maxHeight;
-                const x = i * barWidth + (barWidth * 0.1);
+                const barHeight = (value / 255) * (height * 0.45);
+                const x = i * barWidth;
+                
                 const gradient = ctx.createLinearGradient(0, center - barHeight, 0, center + barHeight);
                 gradient.addColorStop(0, 'rgba(255, 90, 110, 0.95)');
-                gradient.addColorStop(0.4, 'rgba(255, 10, 30, 0.95)');
-                gradient.addColorStop(1, 'rgba(255, 0, 15, 0.25)');
+                gradient.addColorStop(0.5, 'rgba(255, 10, 30, 0.95)');
+                gradient.addColorStop(1, 'rgba(255, 0, 15, 0.2)');
+                
                 ctx.fillStyle = gradient;
-                ctx.fillRect(x, center - barHeight, barWidth * 0.8, barHeight * 2);
+                ctx.fillRect(x + 1, center - barHeight, barWidth - 2, barHeight * 2);
             }
 
             const energy = Math.max(...dataArray) / 255;
-            const rotation = currentLedAngle + (energy > 0.75 ? 8 : 0);
-            led.style.opacity = energy > 0.15 ? '1' : '0.55';
-            led.style.transform = `rotate(${rotation}deg)`;
-        }
+            led.style.opacity = energy > 0.1 ? '1' : '0.5';
+            led.style.transform = `rotate(${currentLedAngle + (energy * 10)}deg)`;
 
-        function drawSpectrum() {
-            if (!spectrumCanvas) return;
-            const dpr = window.devicePixelRatio || 1;
-            spectrumCanvas.width = spectrumCanvas.clientWidth * dpr;
-            spectrumCanvas.height = spectrumCanvas.clientHeight * dpr;
-            const ctx = spectrumCanvas.getContext('2d');
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-            updateSpectrum();
             animationId = requestAnimationFrame(drawSpectrum);
         }
 
-        function setTheme(light) {
-            document.body.classList.toggle('light', light);
-            themeBtn.textContent = light ? 'Tema escuro' : 'Tema claro';
-            isLightTheme = light;
-        }
-
-        function createEqualizerUI() {
-            const style = document.createElement('style');
-            style.textContent = `
-                .equalizer-panel { margin-top: 0.9rem; padding: 0.75rem; border-radius: 16px; background: rgba(255, 0, 15, 0.05); border: 1px solid rgba(255, 0, 15, 0.15); }
-                .equalizer-header { font-size: 0.76rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.6rem; }
-                .equalizer-controls { display: grid; gap: 0.8rem; }
-                .eq-slider { display: grid; gap: 0.25rem; }
-                .eq-slider span { font-size: 0.78rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.8px; }
-                .eq-slider input[type=range] { width: 100%; accent-color: #ff0030; height: 4px; }
-                .eq-slider output { color: var(--text-muted); font-size: 0.74rem; }
-            `;
-            document.head.appendChild(style);
-
-            const equalizerPanel = document.createElement('div');
-            equalizerPanel.className = 'equalizer-panel';
-            equalizerPanel.innerHTML = `
-                <div class="equalizer-header">Equalizador Avançado</div>
-                <div class="equalizer-controls">
-                    ${equalizerBands.map((band, index) => `
-                        <label class="eq-slider">
-                            <span>${band.label} (${band.freq}Hz)</span>
-                            <input type="range" min="${band.min}" max="${band.max}" value="${band.gain}" data-band="${index}">
-                            <output>${band.gain} dB</output>
-                        </label>
-                    `).join('')}
+        function buildEqualizer() {
+            eqControls.innerHTML = equalizerBands.map((band, idx) => `
+                <div class="eq-slider">
+                    <div class="eq-meta">
+                        <span>${band.label} (${band.freq}Hz)</span>
+                        <output id="eqOut-${idx}">0 dB</output>
+                    </div>
+                    <input type="range" min="${band.min}" max="${band.max}" value="${band.gain}" data-idx="${idx}">
                 </div>
-            `;
-            document.getElementById('panel').appendChild(equalizerPanel);
+            `).join('');
 
-            equalizerPanel.querySelectorAll('input[type=range]').forEach(input => {
+            eqControls.querySelectorAll('input[type=range]').forEach(input => {
                 input.addEventListener('input', (e) => {
-                    const bandIdx = e.target.dataset.band;
+                    const idx = e.target.dataset.idx;
                     const val = parseFloat(e.target.value);
-                    equalizerBands[bandIdx].gain = val;
-                    e.target.nextElementSibling.textContent = `${val} dB`;
+                    equalizerBands[idx].gain = val;
+                    document.getElementById(`eqOut-${idx}`).textContent = `${val} dB`;
                     
-                    if (audioContext) {
-                        if (bandIdx == 0 && lowShelfFilter) lowShelfFilter.gain.value = val;
-                        if (bandIdx == 1 && midPeakingFilter) midPeakingFilter.gain.value = val;
-                        if (bandIdx == 2 && highShelfFilter) highShelfFilter.gain.value = val;
-                    }
+                    if (idx == 0 && lowShelfFilter) lowShelfFilter.gain.value = val;
+                    if (idx == 1 && midPeakingFilter) midPeakingFilter.gain.value = val;
+                    if (idx == 2 && highShelfFilter) highShelfFilter.gain.value = val;
                 });
             });
         }
 
-        // Lógica de manipulação de arquivos locais
         trackFiles.addEventListener('change', (e) => {
             const files = Array.from(e.target.files);
-            if (!files.length) return;
-            
             files.forEach(file => {
-                const url = URL.createObjectURL(file);
                 let title = file.name.replace(/\.[^/.]+$/, "");
                 let artist = "Arquivo Local";
-                
                 if (title.includes('-')) {
                     const parts = title.split('-');
                     artist = parts[0].trim();
                     title = parts[1].trim();
                 }
-
-                playlist.push({
-                    title: title,
-                    artist: artist,
-                    album: "Pasta Local",
-                    duration: "00:00",
-                    url: url
-                });
+                playlist.push({ title, artist, album: "Pasta Local", url: URL.createObjectURL(file) });
             });
-
-            if (currentTrackIndex < 0 && playlist.length > 0) {
-                selectTrack(0, false);
-            }
+            if (currentTrackIndex < 0 && playlist.length) selectTrack(0, false);
         });
 
-        // Eventos e Controles do Player
         playBtn.addEventListener('click', togglePlay);
-        themeBtn.addEventListener('click', () => setTheme(!isLightTheme));
+        themeBtn.addEventListener('click', () => {
+            isLightTheme = !isLightTheme;
+            document.body.classList.toggle('light', isLightTheme);
+            themeBtn.textContent = isLightTheme ? 'Tema escuro' : 'Tema claro';
+        });
 
         menuButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const action = btn.dataset.action;
                 setLedDirection(action);
-                
                 if (action === 'next') changeTrack(1);
                 else if (action === 'back') changeTrack(-1);
-                else if (action === 'shuffle') {
-                    isShuffle = !isShuffle;
-                    btn.classList.toggle('highlighted', isShuffle);
-                } else if (action === 'repeat') {
-                    isRepeat = !isRepeat;
-                    btn.classList.toggle('highlighted', isRepeat);
-                } else {
-                    setActiveButton(action);
-                }
+                else if (action === 'shuffle') { isShuffle = !isShuffle; btn.classList.toggle('highlighted', isShuffle); }
+                else if (action === 'repeat') { isRepeat = !isRepeat; btn.classList.toggle('highlighted', isRepeat); }
+                else setActiveButton(action);
             });
         });
 
         volumeRange.addEventListener('input', (e) => {
-            audio.volume = e.target.value / 100;
+            const val = e.target.value;
+            audio.volume = val / 100;
+            e.target.style.setProperty('--seek-before-width', val + '%');
         });
 
         audio.addEventListener('timeupdate', updatePlaybackTime);
-        audio.addEventListener('durationchange', updatePlaybackTime);
-        audio.addEventListener('ended', () => {
-            if (isRepeat) {
-                audio.currentTime = 0;
-                audio.play().catch(() => {});
-            } else {
-                changeTrack(1);
-            }
-        });
+        audio.addEventListener('ended', () => isRepeat ? (audio.currentTime = 0, audio.play()) : changeTrack(1));
 
-        // Inicializações
-        window.addEventListener('resize', () => {
-            if (analyser) updateSpectrum();
-        });
-        
-        createEqualizerUI();
+        // Start
+        buildEqualizer();
     </script>
 </body>
 </html>
